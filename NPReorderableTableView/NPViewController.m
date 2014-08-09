@@ -20,14 +20,30 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.tableView = [[NPReorderableTableView alloc] initWithFrame:self.view.bounds];
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Identifier"];
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Placeholder"];
+    
+}
 
+- (NPReorderableTableView *)tableView {
+    if (!_tableView) {
+        self.tableView = [[NPReorderableTableView alloc] initWithFrame:self.view.bounds];
+        [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Identifier"];
+        [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Placeholder"];
+        [self.view addSubview:self.tableView];
+        self.tableView.dataSource = self;
+        UILabel *invalidLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 150)];
+        invalidLabel.text = @"I am an invalid drag area";
+        invalidLabel.backgroundColor = [UIColor whiteColor];
+        invalidLabel.textAlignment = NSTextAlignmentCenter;
+        invalidLabel.textColor = [UIColor lightGrayColor];
+        self.tableView.tableHeaderView = invalidLabel;
+    }
+    return _tableView;
+}
+
+
+-(void)viewWillAppear:(BOOL)animated {
+    self.tableView.frame = self.view.bounds;
     self.testData = [@[@"1", @"2",@"3", @"4",@"5", @"6",@"7", @"8",@"9", @"10",@"11", @"12",@"13", @"14",@"15", @"16",@"17", @"18"] mutableCopy];
-
-    self.tableView.dataSource = self;
-    [self.view addSubview:self.tableView];
 }
 
 - (void)didReceiveMemoryWarning
@@ -47,9 +63,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = nil;
 
-    if (self.tableView.reordering && [indexPath isEqual:self.tableView.dropIndexPath ]) {
+    if (self.tableView.dragging && [indexPath isEqual:self.tableView.dropIndexPath ]) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"Placeholder"];
-        cell.contentView.backgroundColor = [UIColor whiteColor];
+        cell.contentView.backgroundColor = [UIColor lightGrayColor];
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:@"Identifier"];
         cell.textLabel.text = self.testData[indexPath.row];

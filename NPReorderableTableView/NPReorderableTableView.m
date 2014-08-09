@@ -8,14 +8,18 @@
 
 #import "NPReorderableTableView.h"
 
-@interface NPReorderableTableView () <UIGestureRecognizerDelegate>
+@interface NPReorderableTableView () <UIGestureRecognizerDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) UILongPressGestureRecognizer *triggerGesture;
-@property (nonatomic, retain) NSIndexPath *dragIndexPath;
-@property (nonatomic, retain) CADisplayLink *displayLink;
-@property (nonatomic, retain) UIImageView *cellGhost;
+@property (nonatomic, strong, readwrite) NSIndexPath *dragIndexPath;
+@property (nonatomic, strong, readwrite) NSIndexPath *dropIndexPath;
+@property (nonatomic, strong) CADisplayLink *displayLink;
+@property (nonatomic, strong) UIImageView *cellGhost;
 @property (nonatomic) CGPoint touchPoint;
-@property (nonatomic, readwrite) BOOL reordering;
+
+//States
+@property (nonatomic, assign) BOOL internalDragging;
+@property (nonatomic, assign, getter = validMove) BOOL validMove;
 
 @end
 
@@ -49,15 +53,36 @@
     self.triggerGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(triggerGestureActivated:)];
     self.triggerGesture.delegate = self;
     [self addGestureRecognizer:self.triggerGesture];
+    self.allowsDragging = YES;
+    self.showsInvalidMove = YES;
+    self.dataSource = self;
 }
 
 - (void)reset {
+    self.internalDragging = NO;
     [self.cellGhost removeFromSuperview];
     self.cellGhost = nil;
     self.dropIndexPath = nil;
     self.dragIndexPath = nil;
     [self.displayLink invalidate];
     self.displayLink = nil;
+
+    //Cancel any current gesture
+    self.triggerGesture.enabled = NO;
+    self.triggerGesture.enabled = YES;
+}
+
+- (BOOL)isDragging {
+    return self.internalDragging;
+}
+
+- (void)setAllowsDragging:(BOOL)allowsDragging {
+    if (_allowsDragging == allowsDragging) return; ///////////////
+
+    if (!allowsDragging) [self reset];
+    self.triggerGesture.enabled = allowsDragging;
+
+    _allowsDragging = allowsDragging;
 }
 
 #pragma mark - Drag Logic
@@ -65,12 +90,12 @@
 - (void)triggerGestureActivated:(UILongPressGestureRecognizer *)recognizer {
     switch (recognizer.state) {
         case UIGestureRecognizerStateBegan:
-        self.reordering = YES;
+        self.internalDragging = YES;
         [self beginDragging];
         break;
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled:
-        self.reordering = NO;
+        self.internalDragging = NO;
         [self endDragging];
         break;
 
@@ -107,8 +132,7 @@
     if (![indexPath isEqual:self.dropIndexPath]) {
         [self beginUpdates];
         [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:self.dropIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-        [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-
+        [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
 
         self.dropIndexPath = indexPath;
         [self endUpdates];
@@ -137,6 +161,61 @@
     [UIView commitAnimations];
 }
 
+- (void)invalidMoveAnimation {
+    [UIView beginAnimations:@"offTable" context:nil];
+    self.cellGhost.alpha = 1.0f;
+    self.cellGhost.transform = CGAffineTransformMakeRotation(M_PI/32);
+    self.cellGhost.center = CGPointMake(self.center.x, self.touchPoint.y);
+    [UIView commitAnimations];
+}
+- (NSIndexPath *)translatedIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath == nil) return nil; ////////
+
+    if ([self.delegate respondsToSelector:@selector(tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:)]) {
+        indexPath = [self.delegate tableView:self targetIndexPathForMoveFromRowAtIndexPath:self.dragIndexPath toProposedIndexPath:indexPath];
+    }
+
+    return indexPath;
+}
+- (void)showMoveValidity {
+
+    NSIndexPath *indexPath = [self indexPathForRowAtPoint:self.touchPoint];
+    NSIndexPath *translatedIndexPath = [self translatedIndexPath:indexPath];
+
+    BOOL newIsValidMove = (indexPath && [translatedIndexPath isEqual:indexPath]);
+    BOOL oldIsValidMove = self.validMove;
+
+    if (oldIsValidMove != newIsValidMove) {
+        if (newIsValidMove == NO) {
+            [self invalidMoveAnimation];
+        }else {
+            [self dragDidStartAnimation];
+        }
+    }
+
+    self.validMove = newIsValidMove;
+}
+
+
+- (void)updateGhostImagePostion {
+    CGFloat centerPosition = self.touchPoint.y;
+    CGFloat halfGhostHeight = self.cellGhost.bounds.size.height * 0.5f;
+
+    if (centerPosition - self.contentOffset.y - halfGhostHeight < 0) {
+        centerPosition = self.contentOffset.y + halfGhostHeight;
+    }else if (centerPosition + halfGhostHeight > self.bounds.size.height + self.contentOffset.y) {
+        centerPosition = (self.bounds.size.height+ self.contentOffset.y) - halfGhostHeight;
+    }
+
+    if (self.touchPoint.y > 0) {
+        self.cellGhost.center = CGPointMake(self.center.x, centerPosition);
+
+        if (self.showsInvalidMove) {
+            [self showMoveValidity];
+        }
+    }
+}
+
 - (UIImage *)ghostImageWithCell:(UITableViewCell *)cell
 {
     UIGraphicsBeginImageContextWithOptions(cell.bounds.size, cell.opaque, 0.0f);
@@ -146,7 +225,7 @@
     return snapshotImage;
 }
 
--(BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     return ([self indexPathForRowAtPoint:[gestureRecognizer locationInView:self]] != nil);
 }
 
@@ -154,10 +233,8 @@
     self.touchPoint = [self.triggerGesture locationInView:self];
     [self updateScroll];
     
+    [self updateGhostImagePostion];
     if (![self indexPathForRowAtPoint:self.touchPoint]) return;
-    if (self.touchPoint.y >= 0 && self.touchPoint.y <= self.contentSize.height + 50) {
-        self.cellGhost.center = CGPointMake(self.center.x, self.touchPoint.y);
-    }
 
     [self updateDragWithPoint:self.touchPoint];
 }
@@ -170,6 +247,13 @@
 
 
 #pragma mark - Scroll
+
+- (BOOL)contentFitsOnTable {
+    CGRect posedContentRect = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
+    BOOL contentFitsInTable = CGRectContainsRect(self.bounds, posedContentRect);
+
+    return contentFitsInTable;
+}
 
 - (CGFloat)scrollRateForUserPosition:(CGFloat)userPosition scrollThreshold:(CGFloat)threshold {
     CGFloat topThreshold =  self.contentOffset.y
@@ -189,9 +273,9 @@
 }
 
 - (void)updateScroll {
-    CGFloat offscreenScrollMax = self.contentSize.height + self.contentInset.bottom - self.bounds.size.height;
+    if (!self.internalDragging || [self contentFitsOnTable]) return; ////////////////////
 
-    if (!self.reordering || !offscreenScrollMax) return;
+    CGFloat offscreenScrollMax = self.contentSize.height + self.contentInset.bottom - self.bounds.size.height;
 
     CGFloat threshold = (self.bounds.size.height-self.contentInset.top)/6.0f;
     self.touchPoint = [self.triggerGesture locationInView:self];
