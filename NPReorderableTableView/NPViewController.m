@@ -8,7 +8,7 @@
 
 #import "NPViewController.h"
 #import "NPReorderableTableView.h"
-@interface NPViewController () <UITableViewDataSource>
+@interface NPViewController () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, strong) NPReorderableTableView *tableView;
 @property (nonatomic, strong) NSMutableArray *testData;
@@ -30,6 +30,7 @@
         [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Placeholder"];
         [self.view addSubview:self.tableView];
         self.tableView.dataSource = self;
+        self.tableView.delegate = self;
         UILabel *invalidLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 150)];
         invalidLabel.text = @"I am an invalid drag area";
         invalidLabel.backgroundColor = [UIColor whiteColor];
@@ -43,7 +44,7 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     self.tableView.frame = self.view.bounds;
-    self.testData = [@[@"1", @"2",@"3", @"4",@"5", @"6",@"7", @"8",@"9", @"10",@"11", @"12",@"13", @"14",@"15", @"16",@"17", @"18"] mutableCopy];
+    self.testData = [@[@"1", @"2",@"3", @"4",@"5", @"6",@"7", @"8",@"9", @"10",@"11", @"12",@"13", @"14",@"15 - dont move", @"16 - dont move",@"17 - dont move", @"18 - dont move"] mutableCopy];
 }
 
 - (void)didReceiveMemoryWarning
@@ -69,19 +70,28 @@
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:@"Identifier"];
         cell.textLabel.text = self.testData[indexPath.row];
-
     }
 
     return cell;
 }
--(NSMutableArray *)dataInSection:(NSUInteger)section {
+
+- (NSMutableArray *)dataInSection:(NSUInteger)section {
     return self.testData[section];
 }
--(void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 
     id buffer = self.testData[sourceIndexPath.row];
     [self.testData removeObjectAtIndex:sourceIndexPath.row];
     [self.testData insertObject:buffer atIndex:destinationIndexPath.row];
+}
+
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+    NSIndexPath *newIndexPath = proposedDestinationIndexPath;
+    if (newIndexPath.row >= 13) {
+        newIndexPath = [NSIndexPath indexPathForRow:13 inSection:newIndexPath.section];
+    }
+    return newIndexPath;
 }
 
 @end
