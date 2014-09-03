@@ -3,8 +3,6 @@ NPReorderableTableView
 
 Replacement for Apples UITableView providing drag-and-drop reordering with no drag handles. 
 
-**This is a very early prototype and I havent squashed all the bugs yet. Use in a production app at your own risk!**
-
 [![](https://s3-us-west-1.amazonaws.com/nicholas-peterson-github/fast_demo.gif)](https://s3-us-west-1.amazonaws.com/nicholas-peterson-github/fast_demo.gif)
 
 The Story
