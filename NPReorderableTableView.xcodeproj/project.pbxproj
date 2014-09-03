@@ -21,7 +21,7 @@
 		01F99C6619933FA8009ECD15 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 01F99C6419933FA8009ECD15 /* InfoPlist.strings */; };
 		01F99C6819933FA8009ECD15 /* NPReorderableTableViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F99C6719933FA8009ECD15 /* NPReorderableTableViewTests.m */; };
 		01F99C7619933FE1009ECD15 /* NPReorderableTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F99C7319933FE1009ECD15 /* NPReorderableTableView.m */; };
-		01F99C7719933FE1009ECD15 /* NPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F99C7519933FE1009ECD15 /* NPViewController.m */; };
+		01F99C7719933FE1009ECD15 /* QuickStartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F99C7519933FE1009ECD15 /* QuickStartViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,8 +54,8 @@
 		01F99C6719933FA8009ECD15 /* NPReorderableTableViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NPReorderableTableViewTests.m; sourceTree = "<group>"; };
 		01F99C7219933FE1009ECD15 /* NPReorderableTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NPReorderableTableView.h; sourceTree = "<group>"; };
 		01F99C7319933FE1009ECD15 /* NPReorderableTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NPReorderableTableView.m; sourceTree = "<group>"; };
-		01F99C7419933FE1009ECD15 /* NPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NPViewController.h; sourceTree = "<group>"; };
-		01F99C7519933FE1009ECD15 /* NPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NPViewController.m; sourceTree = "<group>"; };
+		01F99C7419933FE1009ECD15 /* QuickStartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickStartViewController.h; sourceTree = "<group>"; };
+		01F99C7519933FE1009ECD15 /* QuickStartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuickStartViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,14 +115,10 @@
 		01F99C4219933FA8009ECD15 /* NPReorderableTableView */ = {
 			isa = PBXGroup;
 			children = (
-				01F99C5419933FA8009ECD15 /* Images.xcassets */,
-				01F99C4E19933FA8009ECD15 /* Main.storyboard */,
-				01F99C4B19933FA8009ECD15 /* NPAppDelegate.h */,
-				01F99C4C19933FA8009ECD15 /* NPAppDelegate.m */,
+				01F99C7419933FE1009ECD15 /* QuickStartViewController.h */,
+				01F99C7519933FE1009ECD15 /* QuickStartViewController.m */,
 				01F99C7219933FE1009ECD15 /* NPReorderableTableView.h */,
 				01F99C7319933FE1009ECD15 /* NPReorderableTableView.m */,
-				01F99C7419933FE1009ECD15 /* NPViewController.h */,
-				01F99C7519933FE1009ECD15 /* NPViewController.m */,
 				01F99C4319933FA8009ECD15 /* Supporting Files */,
 			);
 			path = NPReorderableTableView;
@@ -131,6 +127,10 @@
 		01F99C4319933FA8009ECD15 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				01F99C5419933FA8009ECD15 /* Images.xcassets */,
+				01F99C4E19933FA8009ECD15 /* Main.storyboard */,
+				01F99C4B19933FA8009ECD15 /* NPAppDelegate.h */,
+				01F99C4C19933FA8009ECD15 /* NPAppDelegate.m */,
 				01F99C4419933FA8009ECD15 /* NPReorderableTableView-Info.plist */,
 				01F99C4519933FA8009ECD15 /* InfoPlist.strings */,
 				01F99C4819933FA8009ECD15 /* main.m */,
@@ -257,7 +257,7 @@
 			files = (
 				01F99C4D19933FA8009ECD15 /* NPAppDelegate.m in Sources */,
 				01F99C7619933FE1009ECD15 /* NPReorderableTableView.m in Sources */,
-				01F99C7719933FE1009ECD15 /* NPViewController.m in Sources */,
+				01F99C7719933FE1009ECD15 /* QuickStartViewController.m in Sources */,
 				01F99C4919933FA8009ECD15 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -463,6 +463,7 @@
 				01F99C6D19933FA8009ECD15 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		01F99C6E19933FA8009ECD15 /* Build configuration list for PBXNativeTarget "NPReorderableTableViewTests" */ = {
 			isa = XCConfigurationList;
@@ -471,6 +472,7 @@
 				01F99C7019933FA8009ECD15 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
