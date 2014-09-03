@@ -14,5 +14,13 @@
 @property (nonatomic, assign) BOOL allowsDragging;
 @property (nonatomic, assign) BOOL showsInvalidMove;
 
+/**
+ *  Determines if the table is dragging the given index path
+ *
+ *  @param indexPath The indexPath of the cell in question
+ *
+ *  @return YES if the table is currently dragging and if indexPath matches the picked up index path.
+ */
+- (BOOL)isDraggingIndexPath:(NSIndexPath *)indexPath;
 
 @end

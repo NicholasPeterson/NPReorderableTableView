@@ -312,4 +312,8 @@
     self.contentOffset = offset;
 }
 
+- (BOOL)isDraggingIndexPath:(NSIndexPath *)indexPath {
+    return self.internalDragging && [indexPath isEqual:self.dropIndexPath];
+}
+
 @end

@@ -31,7 +31,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = nil;
 
-    if (self.tableView.dragging && [indexPath isEqual:self.tableView.dropIndexPath]) {
+    if ([self.tableView isDraggingIndexPath:indexPath]) {
         // 2) REQUIRED: Use your placeholder cell if we are dragging and being asked for the dragged index
 
         // EXAMPLE:
