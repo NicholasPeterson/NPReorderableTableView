@@ -23,7 +23,7 @@ Getting Started
 **_CocoaPod support coming soon_**
 
 NPReorderableTableView is intended to be used like a regular UITableView with as few exceptions as possible.
-**Read the [QuickStartViewController](https://github.com/NicholasPeterson/NPReorderableTableView/blob/master/NPReorderableTableView/QuickStartViewController.m) to get started quickly.**
+**Read the [QuickStartViewController](https://github.com/NicholasPeterson/NPReorderableTableView/blob/master/NPReorderableTableView/QuickStartViewController.m) to get started.**
 
 - Advanced Usage -
 --
