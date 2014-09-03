@@ -40,6 +40,14 @@
     return self;
 }
 
+- (id)initWithFrame:(CGRect)frame style:(UITableViewStyle)style {
+    self = [super initWithFrame:frame style:style];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
+}
+
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
