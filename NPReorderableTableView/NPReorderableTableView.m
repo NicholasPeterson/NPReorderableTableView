@@ -8,7 +8,7 @@
 
 #import "NPReorderableTableView.h"
 
-@interface NPReorderableTableView () <UIGestureRecognizerDelegate, UITableViewDataSource>
+@interface NPReorderableTableView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UILongPressGestureRecognizer *triggerGesture;
 @property (nonatomic, strong, readwrite) NSIndexPath *dragIndexPath;
@@ -55,7 +55,6 @@
     [self addGestureRecognizer:self.triggerGesture];
     self.allowsDragging = YES;
     self.showsInvalidMove = YES;
-    self.dataSource = self;
 }
 
 - (void)reset {
@@ -84,6 +83,7 @@
 
     _allowsDragging = allowsDragging;
 }
+
 
 #pragma mark - Drag Logic
 
@@ -130,13 +130,22 @@
     }
 
     if (![indexPath isEqual:self.dropIndexPath]) {
-        [self beginUpdates];
-        [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:self.dropIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-        [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        [self commitDragChangeFromIndexPath:self.dropIndexPath toIndexPath:indexPath];
 
-        self.dropIndexPath = indexPath;
-        [self endUpdates];
     }
+}
+
+- (void)commitDragChangeFromIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    [self beginUpdates];
+    [self deleteRowsAtIndexPaths:@[fromIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+    [self insertRowsAtIndexPaths:@[toIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+
+    if ([self.dataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)])
+        [self.dataSource tableView:self moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+
+    self.dropIndexPath = toIndexPath;
+    [self endUpdates];
+
 }
 
 - (void)endDragging {
@@ -147,7 +156,7 @@
         self.cellGhost.frame = [self rectForRowAtIndexPath:indexPath];
     }completion:^(BOOL finished) {
         if (finished) {
-            [self commitDrop];
+            [self reloadRowsAtIndexPaths:@[self.dropIndexPath] withRowAnimation:UITableViewRowAnimationNone];
             [self reset];
         }
     }];
@@ -237,12 +246,6 @@
     if (![self indexPathForRowAtPoint:self.touchPoint]) return;
 
     [self updateDragWithPoint:self.touchPoint];
-}
-
-- (void)commitDrop {
-    if ([self.dataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)])
-    [self.dataSource tableView:self moveRowAtIndexPath:self.dragIndexPath toIndexPath:self.dropIndexPath];
-    [self reloadRowsAtIndexPaths:@[self.dropIndexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 
 
