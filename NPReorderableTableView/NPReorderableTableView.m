@@ -104,6 +104,16 @@
     }
 }
 
+- (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self.dataSource respondsToSelector:@selector(tableView:canMoveRowAtIndexPath:)]) {
+        if (![self.dataSource tableView:self canMoveRowAtIndexPath:indexPath]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 - (void)beginDragging {
     self.touchPoint = [self.triggerGesture locationInView:self];
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(syncDisplay:)];
@@ -112,6 +122,11 @@
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:self.touchPoint];
     self.dragIndexPath = indexPath;
     self.dropIndexPath = indexPath;
+
+    if (![self canMoveRowAtIndexPath:indexPath]) { /////
+        [self reset];
+        return;
+    }
 
     UITableViewCell *cell = [self cellForRowAtIndexPath:self.dragIndexPath];
     cell.highlighted = NO;
@@ -151,11 +166,14 @@
 }
 
 - (void)endDragging {
-    NSIndexPath *indexPath = [self indexPathForRowAtPoint:self.touchPoint];
+    if (!self.dropIndexPath)///////
+        return;
+
+    NSIndexPath *indexPath = self.dropIndexPath;
 
     [UIView animateWithDuration:0.2 animations:^{
         self.cellGhost.transform = CGAffineTransformIdentity;
-        self.cellGhost.frame = [self rectForRowAtIndexPath:indexPath];
+        self.cellGhost.frame = [self rectForRowAtIndexPath:[self translatedIndexPath:indexPath]];
     }completion:^(BOOL finished) {
         if (finished) {
             [self reloadRowsAtIndexPaths:@[self.dropIndexPath] withRowAnimation:UITableViewRowAnimationNone];
