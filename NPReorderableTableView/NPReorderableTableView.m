@@ -124,6 +124,9 @@
 }
 
 - (void)updateDragWithPoint:(CGPoint)touchPoint {
+    if (touchPoint.x != touchPoint.x || touchPoint.y != touchPoint.y) {
+        return;
+    }
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:touchPoint];
     if ([self.delegate respondsToSelector:@selector(tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:)]) {
         indexPath = [self.delegate tableView:self targetIndexPathForMoveFromRowAtIndexPath:self.dragIndexPath toProposedIndexPath:indexPath];
@@ -131,7 +134,6 @@
 
     if (![indexPath isEqual:self.dropIndexPath]) {
         [self commitDragChangeFromIndexPath:self.dropIndexPath toIndexPath:indexPath];
-
     }
 }
 
