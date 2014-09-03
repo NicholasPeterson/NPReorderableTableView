@@ -16,7 +16,7 @@ The Story
 Requirements
 ----
 - iOS7 +
-- UIKit Framework
+- Automatic Reference Counting
 
 Getting Started
 --------------
