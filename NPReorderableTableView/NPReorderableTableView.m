@@ -11,8 +11,7 @@
 @interface NPReorderableTableView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UILongPressGestureRecognizer *triggerGesture;
-@property (nonatomic, strong, readwrite) NSIndexPath *dragIndexPath;
-@property (nonatomic, strong, readwrite) NSIndexPath *dropIndexPath;
+@property (nonatomic, strong, readwrite) NSIndexPath *draggingIndexPath;
 @property (nonatomic, strong) CADisplayLink *displayLink;
 @property (nonatomic, strong) UIImageView *cellGhost;
 @property (nonatomic) CGPoint touchPoint;
@@ -61,8 +60,7 @@
     self.internalDragging = NO;
     [self.cellGhost removeFromSuperview];
     self.cellGhost = nil;
-    self.dropIndexPath = nil;
-    self.dragIndexPath = nil;
+    self.draggingIndexPath = nil;
     [self.displayLink invalidate];
     self.displayLink = nil;
 
@@ -120,22 +118,21 @@
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:self.touchPoint];
-    self.dragIndexPath = indexPath;
-    self.dropIndexPath = indexPath;
+    self.draggingIndexPath = indexPath;
 
     if (![self canMoveRowAtIndexPath:indexPath]) { /////
         [self reset];
         return;
     }
 
-    UITableViewCell *cell = [self cellForRowAtIndexPath:self.dragIndexPath];
+    UITableViewCell *cell = [self cellForRowAtIndexPath:self.draggingIndexPath];
     cell.highlighted = NO;
     self.cellGhost = [[UIImageView alloc] initWithImage:[self ghostImageWithCell:cell]];
     [self addSubview:self.cellGhost];
     self.cellGhost.frame = cell.frame;
 
     [self dragDidStartAnimation];
-    [self reloadRowsAtIndexPaths:@[self.dropIndexPath] withRowAnimation: UITableViewRowAnimationNone];
+    [self reloadRowsAtIndexPaths:@[self.draggingIndexPath] withRowAnimation: UITableViewRowAnimationNone];
 }
 
 - (void)updateDragWithPoint:(CGPoint)touchPoint {
@@ -144,11 +141,11 @@
     }
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:touchPoint];
     if ([self.delegate respondsToSelector:@selector(tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:)]) {
-        indexPath = [self.delegate tableView:self targetIndexPathForMoveFromRowAtIndexPath:self.dragIndexPath toProposedIndexPath:indexPath];
+        indexPath = [self.delegate tableView:self targetIndexPathForMoveFromRowAtIndexPath:self.draggingIndexPath toProposedIndexPath:indexPath];
     }
 
-    if (![indexPath isEqual:self.dropIndexPath]) {
-        [self commitDragChangeFromIndexPath:self.dropIndexPath toIndexPath:indexPath];
+    if (![indexPath isEqual:self.draggingIndexPath]) {
+        [self commitDragChangeFromIndexPath:self.draggingIndexPath toIndexPath:indexPath];
     }
 }
 
@@ -160,23 +157,23 @@
     if ([self.dataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)])
         [self.dataSource tableView:self moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
 
-    self.dropIndexPath = toIndexPath;
+    self.draggingIndexPath = toIndexPath;
     [self endUpdates];
 
 }
 
 - (void)endDragging {
-    if (!self.dropIndexPath)///////
+    if (!self.draggingIndexPath)///////
         return;
 
-    NSIndexPath *indexPath = self.dropIndexPath;
+    NSIndexPath *indexPath = self.draggingIndexPath;
 
     [UIView animateWithDuration:0.2 animations:^{
         self.cellGhost.transform = CGAffineTransformIdentity;
         self.cellGhost.frame = [self rectForRowAtIndexPath:[self translatedIndexPath:indexPath]];
     }completion:^(BOOL finished) {
         if (finished) {
-            [self reloadRowsAtIndexPaths:@[self.dropIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [self reloadRowsAtIndexPaths:@[self.draggingIndexPath] withRowAnimation:UITableViewRowAnimationNone];
             [self reset];
         }
     }];
@@ -201,7 +198,7 @@
     if (indexPath == nil) return nil; ////////
 
     if ([self.delegate respondsToSelector:@selector(tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:)]) {
-        indexPath = [self.delegate tableView:self targetIndexPathForMoveFromRowAtIndexPath:self.dragIndexPath toProposedIndexPath:indexPath];
+        indexPath = [self.delegate tableView:self targetIndexPathForMoveFromRowAtIndexPath:self.draggingIndexPath toProposedIndexPath:indexPath];
     }
 
     return indexPath;
@@ -313,7 +310,7 @@
 }
 
 - (BOOL)isDraggingIndexPath:(NSIndexPath *)indexPath {
-    return self.internalDragging && [indexPath isEqual:self.dropIndexPath];
+    return self.internalDragging && [indexPath isEqual:self.draggingIndexPath];
 }
 
 @end

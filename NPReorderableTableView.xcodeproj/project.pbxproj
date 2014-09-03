@@ -52,8 +52,8 @@
 		01F99C6319933FA8009ECD15 /* NPReorderableTableViewTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NPReorderableTableViewTests-Info.plist"; sourceTree = "<group>"; };
 		01F99C6519933FA8009ECD15 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		01F99C6719933FA8009ECD15 /* NPReorderableTableViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NPReorderableTableViewTests.m; sourceTree = "<group>"; };
-		01F99C7219933FE1009ECD15 /* NPReorderableTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NPReorderableTableView.h; sourceTree = "<group>"; };
-		01F99C7319933FE1009ECD15 /* NPReorderableTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NPReorderableTableView.m; sourceTree = "<group>"; };
+		01F99C7219933FE1009ECD15 /* NPReorderableTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = NPReorderableTableView.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		01F99C7319933FE1009ECD15 /* NPReorderableTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = NPReorderableTableView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		01F99C7419933FE1009ECD15 /* QuickStartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickStartViewController.h; sourceTree = "<group>"; };
 		01F99C7519933FE1009ECD15 /* QuickStartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuickStartViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */

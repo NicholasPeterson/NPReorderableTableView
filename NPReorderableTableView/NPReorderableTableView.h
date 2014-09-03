@@ -9,8 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface NPReorderableTableView : UITableView
-@property (nonatomic, readonly) NSIndexPath *dragIndexPath;
-@property (nonatomic, readonly) NSIndexPath *dropIndexPath;
+@property (nonatomic, readonly) NSIndexPath *draggingIndexPath;
 @property (nonatomic, assign) BOOL allowsDragging;
 @property (nonatomic, assign) BOOL showsInvalidMove;
 
